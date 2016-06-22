@@ -1,12 +1,26 @@
 #!/usr/bin/env python
 import os
+import errno
 import subprocess
 from multiprocessing import Process, Event
 from flask import Flask, request, jsonify
 
 
+def mkdir_p(path):
+    try:
+        os.makedirs(path)
+    except OSError as exc:  # Python >2.5
+        if exc.errno == errno.EEXIST and os.path.isdir(path):
+            pass
+        else:
+            raise
+
+
 def watch(kill_event, env, skip_setup, setup_command, command, source_dir, app_dir,
           load_to_app_directory):
+    # Ensure that the app directory exists
+    mkdir_p(app_dir)
+
     if load_to_app_directory.lower() == 'true':
         # Create a tarball using the shell
         response = subprocess.call(
