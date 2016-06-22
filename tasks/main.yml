@@ -10,9 +10,9 @@
     state: directory
     path: /dev
 
-- name: Copy dev server into /dev/server.py
+- name: Copy dev server into /usr/local/bin
   become: yes
   copy:
     src: server.py
-    dest: /dev/server.py
+    dest: /usr/local/bin/packsible-dev-server
     mode: 0755
