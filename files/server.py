@@ -132,7 +132,10 @@ def main():
     # Start the build process
     dev_server.start()
 
-    app.run(port=int(os.environ.get('PACKSIBLE_DEV_PORT', '31111')))
+    app.run(
+        host=os.environ.get("PACKSIBLE_DEV_HOST", "0.0.0.0"),
+        port=int(os.environ.get('PACKSIBLE_DEV_PORT', '31111'))
+    )
 
 
 if __name__ == "__main__":
