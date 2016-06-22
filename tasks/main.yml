@@ -1,0 +1,4 @@
+- name: Install flask for python
+  pip:
+    name: flask
+    state: latest
