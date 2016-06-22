@@ -1,4 +1,18 @@
 - name: Install flask for python
+  become: yes
   pip:
     name: flask
     state: latest
+
+- name: Create the /dev directory for the packsible-dev-server
+  become: yes
+  file:
+    state: directory
+    path: /dev
+
+- name: Copy dev server into /dev/server.py
+  become: yes
+  copy:
+    src: server.py
+    dest: /dev/server.py
+    mode: 0755

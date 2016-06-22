@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import os
 import subprocess
 from multiprocessing import Process, Event
@@ -117,7 +118,7 @@ def main():
     # Start the build process
     dev_server.start()
 
-    app.run(port=int(os.environ.get('PORT', '9000')))
+    app.run(port=int(os.environ.get('PACKSIBLE_DEV_PORT', '31111')))
 
 
 if __name__ == "__main__":
