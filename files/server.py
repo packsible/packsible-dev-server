@@ -60,8 +60,10 @@ def watch(kill_event, env, skip_setup, setup_command, command, source_dir, app_d
             break
     print "Received Kill Event"
 
-    process.terminate()
-    process.kill()
+    while process.poll() is None
+        process.terminate()
+        process.kill()
+        time.sleep(0.5)
 
 
 class DevServer(object):
