@@ -60,7 +60,7 @@ def watch(kill_event, env, skip_setup, setup_command, command, source_dir, app_d
             break
     print "Received Kill Event"
 
-    while process.poll() is None
+    while process.poll() is None:
         process.terminate()
         process.kill()
         time.sleep(0.5)
