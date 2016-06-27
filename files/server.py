@@ -2,6 +2,7 @@
 import os
 import time
 import errno
+import shlex
 import subprocess
 from multiprocessing import Process, Event
 from flask import Flask, request, jsonify
@@ -53,7 +54,7 @@ def watch(kill_event, env, skip_setup, setup_command, command, source_dir, app_d
         if response != 0:
             raise Exception('Setup command failed: %s' % setup_command)
     print "Starting up command: %s" % command
-    process = subprocess.Popen(command, shell=True, cwd=app_dir, env=env)
+    process = subprocess.Popen(shlex.split(command), cwd=app_dir, env=env)
 
     while True:
         kill_event.wait(10)
