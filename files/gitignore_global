@@ -1,0 +1,41 @@
+# Compiled files
+*.so
+*.o
+*.exe
+*.com
+*.class
+*.dll
+*.pyc
+
+# vim files
+.*.sw*
+.swp
+
+# Other Python Specific
+*.egg-info
+*.egg
+*.EGG
+*.EGG-INFO
+
+# virtstrap
+quickactivate
+.vs.env
+.virtstrap.log
+
+# Misc
+*.bak
+*.tmp
+
+# Ignore ropeproject shiz
+.ropeproject
+
+# Orig files are annoying
+*.orig
+
+# Ignore node_modules
+node_modules
+
+# vagrant files
+.vagrant
+
+.packsible

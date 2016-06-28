@@ -1,3 +1,14 @@
+- name: Copy global gitignore
+  become: yes
+  copy:
+    src: gitignore_global
+    dest: /etc/gitignore_global
+    mode: 0644
+
+- name: Setup global gitignore
+  become: yes
+  command: git config --global core.excludesfile /etc/gitignore_global
+
 - name: Install flask for python
   become: yes
   pip:
