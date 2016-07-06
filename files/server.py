@@ -90,7 +90,7 @@ class DevServer(object):
             os.environ['PACKSIBLE_DEV_COMMAND'],
             os.environ.get('PACKSIBLE_DEV_SOURCE_DIR', os.path.abspath('.')),
             os.environ.get('PACKSIBLE_DEV_APP_DIR', os.path.abspath('/app')),
-            os.environ.get('PACKSIBLE_DEV_LOAD_TO_APP_DIR', False),
+            os.environ.get('PACKSIBLE_DEV_LOAD_TO_APP_DIR', 'False'),
         ))
         process.start()
         self._process = process
