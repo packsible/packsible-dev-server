@@ -4,8 +4,13 @@ import time
 import errno
 import shlex
 import subprocess
+import stat
+import warnings
 from multiprocessing import Process, Event
 from flask import Flask, request, jsonify
+
+
+DEFAULT_PRESETUP_DIR = '/packsible/presetup'
 
 
 def mkdir_p(path):
@@ -18,41 +23,79 @@ def mkdir_p(path):
             raise
 
 
+def run_pre_setup_commands(env):
+    """Run any executables in the /packsible/presetup directory
+
+    If the presetup commands fail the script will still continue
+    """
+    presetup_dir = os.environ.get('PACKSIBLE_DEV_PRESETUP_DIR', DEFAULT_PRESETUP_DIR)
+    if not os.path.exists(presetup_dir):
+        return
+
+    for file_name in os.listdir(presetup_dir):
+        file_mode = os.stat(os.path.join(presetup_dir, file_name)).st_mode
+        is_executable = file_mode & stat.S_IXUSR and file_mode & stat.S_IXGRP and file_mode & stat.S_IXOTH
+
+        if is_executable:
+            pre_setup_response = subprocess.call(
+                './%s' % file_name,
+                cwd=presetup_dir,
+                env=env,
+            )
+
+            if pre_setup_response != 0:
+                warnings.warn('Presetup command "%s" failed.')
+
+
+def run_setup(env, setup_command, command, source_dir, app_dir):
+    # Run pre setup
+    run_pre_setup_commands(env)
+
+    # Run setup command
+    setup_response = subprocess.call(setup_command, shell=True, cwd=app_dir,
+                                     env=env)
+
+    if setup_response != 0:
+        raise Exception('Setup command failed: %s' % setup_command)
+
+
+def load_source_to_app_directory(env, source_dir, app_dir):
+    # Create a tarball using the shell
+    response = subprocess.call(
+        'git ls-files -c -o --exclude-standard | tar -czf %s/build.tar.gz -T -' % app_dir,
+        shell=True,
+        cwd=source_dir,
+        env=env
+    )
+
+    if response != 0:
+        raise Exception('Could not package directory')
+
+    response = subprocess.call(
+        'tar xvf build.tar.gz',
+        shell=True,
+        cwd=app_dir,
+        env=env
+    )
+
+    if response != 0:
+        raise Exception('Could not unpack application changes')
+
+    os.remove(os.path.join(app_dir, 'build.tar.gz'))
+
+
+
 def watch(kill_event, env, skip_setup, setup_command, command, source_dir, app_dir,
           load_to_app_directory):
     # Ensure that the app directory exists
     mkdir_p(app_dir)
 
     if load_to_app_directory.lower() == 'true':
-        # Create a tarball using the shell
-        response = subprocess.call(
-            'git ls-files -c -o --exclude-standard | tar -czf %s/build.tar.gz -T -' % app_dir,
-            shell=True,
-            cwd=source_dir,
-            env=env
-        )
-
-        if response != 0:
-            raise Exception('Could not package directory')
-
-        response = subprocess.call(
-            'tar xvf build.tar.gz',
-            shell=True,
-            cwd=app_dir,
-            env=env
-        )
-
-        if response != 0:
-            raise Exception('Could not unpack application changes')
-
-        os.remove(os.path.join(app_dir, 'build.tar.gz'))
+        load_source_to_app_directory(env, source_dir, app_dir)
 
     if not skip_setup and setup_command:
-        print "Running setup command: %s" % setup_command
-        response = subprocess.call(setup_command, shell=True, cwd=app_dir,
-                                   env=env)
-        if response != 0:
-            raise Exception('Setup command failed: %s' % setup_command)
+        run_setup(env, setup_command, command, source_dir, app_dir)
+
     print "Starting up command: %s" % command
     process = subprocess.Popen(shlex.split(command), cwd=app_dir, env=env)
 

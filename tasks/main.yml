@@ -15,11 +15,14 @@
     name: flask
     state: latest
 
-- name: Create the /dev directory for the packsible-dev-server
+- name: Setup the /packsible directory for the packsible-dev-server
   become: yes
   file:
     state: directory
-    path: /dev
+    path: "{{ item }}"
+  with_items:
+    - /packsible
+    - /packsible/presetup
 
 - name: Copy dev server into /usr/local/bin
   become: yes
