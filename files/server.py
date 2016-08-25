@@ -10,7 +10,7 @@ from multiprocessing import Process, Event
 from flask import Flask, request, jsonify
 
 
-DEFAULT_PRESETUP_DIR = '/packsible/presetup'
+DEFAULT_PRESETUP_DIR = '/packsible-dev-server/presetup'
 
 
 def mkdir_p(path):
@@ -24,7 +24,7 @@ def mkdir_p(path):
 
 
 def run_pre_setup_commands(env):
-    """Run any executables in the /packsible/presetup directory
+    """Run any executables in the /packsible-dev-server/presetup directory
 
     If the presetup commands fail the script will still continue
     """

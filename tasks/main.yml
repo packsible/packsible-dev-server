@@ -21,8 +21,8 @@
     state: directory
     path: "{{ item }}"
   with_items:
-    - /packsible
-    - /packsible/presetup
+    - /packsible-dev-server
+    - /packsible-dev-server/presetup
 
 - name: Copy dev server into /usr/local/bin
   become: yes
